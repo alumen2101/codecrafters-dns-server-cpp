@@ -4,6 +4,9 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
+#include "message.hpp"
+
+
 int main() {
     // Flush after every std::cout / std::cerr
     std::cout << std::unitbuf;
@@ -43,6 +46,7 @@ int main() {
     char buffer[512];
     socklen_t clientAddrLen = sizeof(clientAddress);
 
+
     while (true) {
         // Receive data
         bytesRead = recvfrom(udpSocket, buffer, sizeof(buffer), 0, reinterpret_cast<struct sockaddr*>(&clientAddress), &clientAddrLen);
@@ -55,10 +59,10 @@ int main() {
         std::cout << "Received " << bytesRead << " bytes: " << buffer << std::endl;
 
         // Create an empty response
-        char response[1] = { '\0' };
+        auto msg = Message{};
 
         // Send response
-        if (sendto(udpSocket, response, sizeof(response), 0, reinterpret_cast<struct sockaddr*>(&clientAddress), sizeof(clientAddress)) == -1) {
+        if (sendto(udpSocket, msg.getArray(), msg.size(), 0, reinterpret_cast<struct sockaddr*>(&clientAddress), sizeof(clientAddress)) == -1) {
             perror("Failed to send response");
         }
     }
